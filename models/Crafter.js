@@ -9,6 +9,7 @@ const CrafterSchema = new Schema({
   },
   handle: {
     type: String,
+    required: true,
     max: 40
   },
   company: {
@@ -64,4 +65,4 @@ const CrafterSchema = new Schema({
 });
 
 
-module.exports = Crafters = mongoose.model('crafters', CrafterSchema);
+module.exports = Crafter = mongoose.model('crafters', CrafterSchema);

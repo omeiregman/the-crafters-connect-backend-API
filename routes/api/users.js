@@ -7,7 +7,7 @@ const keys = require('../../config/keys');
 const passport = require('passport')
 
 //Load User model
-const Userr = require('../../models/User');
+const User = require('../../models/User');
 
 //Load Input Validation
 const validateRegisterInput = require('../../validation/register');
@@ -100,6 +100,7 @@ router.post('/login', (req, res) => {
     });
   });
 });
+
 
 // @route    GET api/users/current
 // @desc     Return users routes
