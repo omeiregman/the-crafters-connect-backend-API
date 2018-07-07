@@ -24,7 +24,11 @@ const UserSchema = new Schema({
   },
   account: {
     type: String,
-    default: 'enthusiast'
+    default: 'enthusiast' //enthusiast, crafter, volunteer
+  },
+  subscription: {
+    type: String,
+    default: 'basic' //basic, premium
   }
 });
 
