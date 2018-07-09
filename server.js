@@ -29,6 +29,15 @@ app.use(passport.initialize());
 //Passport Config
 require('./config/passport.js')(passport);
 
+ app.use((req, res, next) => {
+   res.header('Access-Control-Allow_Origin', '*');
+   res.header('Access-Control-Allow-Headers', '*');
+   if (req.method === 'OPTIONS') {
+     res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, GET, DELETE, ');
+     return res.status(200);
+   }
+ });
+
 //Use  routes
 app.use('/api/users', users);
 app.use('/api/crafters', crafters);
