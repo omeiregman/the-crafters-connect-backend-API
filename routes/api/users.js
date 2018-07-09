@@ -16,13 +16,13 @@ const validateLoginInput = require('../../validation/login');
 // @route    GET api/users/test
 // @desc     Tests users routes
 // @access   Public
-router.get('/test', (req, res, next) => res.json({ message: "Users works" }));
+router.get('/test', (req, res) => res.json({ message: "Users works" }));
 
 
 // @route    POST api/users/register
 // @desc     Register user
 // @access   Public
-router.post('/register', (req, res, next) => {
+router.post('/register', (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body);
 
   if(!isValid) {
@@ -62,7 +62,7 @@ router.post('/register', (req, res, next) => {
 // @desc     Login User / Returning JWT Token
 // @access   Public
 
-router.post('/login', (req, res, next) => {
+router.post('/login', (req, res) => {
   const { errors, isValid } = validateLoginInput(req.body);
 
   if(!isValid) {
@@ -104,7 +104,7 @@ router.post('/login', (req, res, next) => {
 // @route    GET api/users/current
 // @desc     Return users routes
 // @access   Private
-router.get('/current', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
   res.json({
     id: req.user.id,
     name: req.user.name,
