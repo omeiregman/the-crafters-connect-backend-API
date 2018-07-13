@@ -15,9 +15,11 @@ const app = express();
 
 app.use(cors());
 
-//Body Parser ,iddlewarre
+//Middlewarre
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 
 //DB Config
 const db = process.env.MONGO_URI;

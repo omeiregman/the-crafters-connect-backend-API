@@ -66,7 +66,7 @@ router.get('/user/:user_id', (req, res) => {
       res.status(404).json(err);
     }
     res.json(crafter);
-  }).catch(err => res.status(404).json({ profile: 'There is no profile for this user' }));
+  }).catch(err => res.status(404).json({ crafter: 'This user id not a crafter' }));
 });
 
 
@@ -101,7 +101,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
 
   // Check Validation
   if(!isValid) {
-    //Return any errors with 400 Statusr
+    //Return any errors with 400 Status
     return res.status(400).json(errors);
   }
   // Get fields
