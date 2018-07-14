@@ -48,7 +48,7 @@ router.get('/all', (req, res, next) => {
       errors.noevent = 'There are currently no events to display at the moment';
       return res.status(404).json(errors);
     }
-    res.json(events);
+    res.json({events: events});
   }).catch(err => {
     res.status(404).json({
       event: 'There are currently no events to display at the moment'
