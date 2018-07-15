@@ -102,6 +102,7 @@ router.post('/add', upload.single('eventImage'), (req, res, next) => {
     if(req.body.endDate) eventFields.endDate = req.body.endDate;
     if(req.body.time) eventFields.time = req.body.time;
     if(req.body.info) eventFields.info = req.body.info;
+    if(req.body.url) eventFields.url = req.body.url;
 
 
 
@@ -118,7 +119,8 @@ router.post('/add', upload.single('eventImage'), (req, res, next) => {
     startDate: eventFields.startDate,
     endDate: eventFields.endDate,
     time: eventFields.time,
-    info: eventFields.info
+    info: eventFields.info,
+    url: eventFields.url
   });
 
   event.save().then(event => {

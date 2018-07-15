@@ -15,6 +15,9 @@ const EventSchema = new Schema({
   endDate: {
     type: String
   },
+  url: {
+    type: String
+  },
   time: {
     type: String
   },
