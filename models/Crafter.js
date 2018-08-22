@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const Schema = mongoose.Schema;
 
 //Create Schema
@@ -12,6 +13,28 @@ const CrafterSchema = new Schema({
     required: true,
     max: 40
   },
+  experience: [
+    {
+    title: {
+      type: String,
+      required: true
+    },
+    description: {
+      type: String
+      },
+    from: {
+      type: Date,
+      required: true
+      },
+    to: {
+      type: Date
+      },
+    current: {
+      type: Boolean,
+      default: false
+      }
+    }
+  ],
   company: {
     type: String
   },
@@ -31,16 +54,6 @@ const CrafterSchema = new Schema({
   bio: {
     type: String
   },
-  experience: [
-    {
-    title: {
-      type: String
-    },
-    description: {
-      type: String
-      }
-    }
-  ],
   social: {
     youtube: {
       type: String

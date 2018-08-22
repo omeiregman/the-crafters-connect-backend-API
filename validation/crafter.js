@@ -23,10 +23,6 @@ module.exports = function validateCrafterInput(data) {
     errors.status = 'Crafters Status is required';
   }
 
-  if (Validator.isEmpty(data.crafts)) {
-    errors.crafts = 'Crafts set is required';
-  }
-
   if(!isEmpty(data.website)) {
     if(!Validator.isURL(data.website)) {
       errors.website = 'Not a valid URL';

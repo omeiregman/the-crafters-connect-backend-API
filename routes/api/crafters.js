@@ -5,6 +5,7 @@ const passport = require('passport');
 
 //Load Validation
 const validateCrafterInput = require('../../validation/crafter');
+const validateExperienceInput = require('../../validation/experience');
 
 //Load Crafter model
 const Crafter = require('../../models/Crafter');
@@ -150,6 +151,38 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
   });
 });
 
+
+// @route    POST api/crafters/experience
+// @desc     Add experience routes
+// @access   Private
+router.post('/experience', passport.authenticate('jwt', { session: false }), (req, res) => {
+
+  const { errors, isValid } = validateExperienceInput(req.body);
+
+  // Check Validation
+  if(!isValid) {
+    //Return any errors with 400 Status
+    return res.status(400).json(errors);
+  }
+
+  Crafter.findOne({ user: req.user.id })
+  .then(crafter => {
+    const newExp = {
+      title: req.body.title,
+      description: req.body.description,
+      from: req.body.from,
+      to: req.body.to
+    }
+
+    //Add to experience array
+    crafter.experience.unshift(newExp);
+
+    crafter.save().then(crafter => res.json(crafter));
+  })
+  .catch(err => {
+    res.status(404).json({ experience: 'An error occured while adding experience'})
+  });
+})
 
 
 module.exports = router;
