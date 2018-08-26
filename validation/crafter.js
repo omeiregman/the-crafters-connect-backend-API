@@ -14,6 +14,10 @@ module.exports = function validateCrafterInput(data) {
     errors.handle = 'Handle needs to be between 2 and 10 Characters';
   }
 
+  if (!Validator.isLength(data.bio, { min: 50, max: 150 })) {
+    errors.bio = 'Bio needs to be between 20 and 150 Characters';
+  }
+
   if (Validator.isEmpty(data.handle)) {
     errors.handle = 'Crafters Handle is required';
   }
@@ -52,8 +56,6 @@ module.exports = function validateCrafterInput(data) {
       errors.instagram = 'Not a valid URL';
     }
   }
-
-
 
 
   return {

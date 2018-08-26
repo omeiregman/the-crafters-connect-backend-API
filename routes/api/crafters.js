@@ -37,6 +37,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
     }).catch(err => res.status(404).json(err));
 });
 
+
 // @route    GET api/profile/handle/:handle
 // @desc     GET Profile by handle
 // @access   Public
@@ -54,6 +55,7 @@ router.get('/handle/:handle', (req, res) => {
 });
 
 
+
 // @route    GET api/profile/user/:user_id
 // @desc     GET Profile by userID
 // @access   Public
@@ -69,6 +71,8 @@ router.get('/user/:user_id', (req, res) => {
     res.json(crafter);
   }).catch(err => res.status(404).json({ crafter: 'This user id not a crafter' }));
 });
+
+
 
 
 // @route    GET api/crafter/all
@@ -89,6 +93,7 @@ router.get('/all', (req, res) => {
     res.status(404).json({ crafter: 'There are no crafters to Display'})
   })
 })
+
 
 
 
@@ -150,6 +155,9 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
     }
   });
 });
+
+
+
 
 
 // @route    POST api/crafters/experience
