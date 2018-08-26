@@ -9,19 +9,18 @@ module.exports = function validateCrafterInput(data) {
   data.status = !isEmpty(data.status) ? data.status : '';
   data.crafts = !isEmpty(data.crafts) ? data.crafts : '';
 
-
-  if (!Validator.isLength(data.handle, { min: 2, max: 10 })) {
-    errors.handle = 'Handle needs to be between 2 and 10 Characters';
+  
+  if (!Validator.isLength(data.handle, { min: 6, max: 12 })) {
+    errors.handle = 'Handle needs to be between 6 and 12 Characters';
   }
 
-  if (!Validator.isLength(data.bio, { min: 50, max: 150 })) {
+  if (!Validator.isLength(data.bio, { min: 20, max: 150 })) {
     errors.bio = 'Bio needs to be between 20 and 150 Characters';
   }
 
   if (Validator.isEmpty(data.handle)) {
     errors.handle = 'Crafters Handle is required';
   }
-
 
   if (Validator.isEmpty(data.status)) {
     errors.status = 'Crafters Status is required';
