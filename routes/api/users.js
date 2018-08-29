@@ -3,7 +3,8 @@ const router = express.Router();
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const passport = require('passport')
+const passport = require('passport');
+const nodemailer = require('nodemailer');
 
 //Load User model
 const User = require('../../models/User');
@@ -53,7 +54,34 @@ router.post('/register', (req, res) => {
           .then(user => res.status(201).json(user))
           .catch(err => console.log(err));
         })
-      })
+      });
+        // create reusable transporter object using the default SMTP transport
+        let transporter = nodemailer.createTransport({
+            host: 'SMTP.gmail.com',
+            port: 465,
+            secure: true, // true for 465, false for other ports
+            auth: {
+                user: 'thecraftersconnectweb@gmail.com', 
+                pass: process.env.GMAIL_PASSWORD
+            }
+        });
+
+        // setup email data with unicode symbols
+        let mailOptions = {
+            from: '"The Crafters Connect" <thecraftersconnectweb@gmail.com>', // sender address
+            to: req.body.email, // list of receivers
+            subject: `${req.body.name}, welcome to TCC ✔`, // Subject line
+            text: 'Welcome to The Crafters Connect, We are pleased to have you signed up on our platform', // plain text body
+        };
+
+        // send mail with defined transport object
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+            console.log('Message sent: %s', info.messageId);
+            console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+        });
     }
   })
 });
