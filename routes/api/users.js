@@ -26,64 +26,64 @@ router.get('/test', (req, res) => res.json({ message: "Users works" }));
 router.post('/register', (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body);
 
-  if(!isValid) {
+  if (!isValid) {
     return res.status(400).json(errors);
   }
   User.findOne({ email: req.body.email })
-  .then(user => {
-    if(user) {
-      errors.email = 'Email already exists';
-      return res.status(400).json(errors);
-    } else {
-      const avatar = gravatar.url(req.body.url, {
-        s: 200, //Size
-        r: 'pg', // Rating
-        default: 'mm' //Default
-      });
-      const newUser = new User({
-        name: req.body.name,
-        email: req.body.email,
-        avatar,
-        password: req.body.password
-      });
-      bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if(err) throw err;
-          newUser.password = hash;
-          newUser.save()
-          .then(user => res.status(201).json(user))
-          .catch(err => console.log(err));
-        })
-      });
+    .then(user => {
+      if (user) {
+        errors.email = 'Email already exists';
+        return res.status(400).json(errors);
+      } else {
+        const avatar = gravatar.url(req.body.url, {
+          s: 200, //Size
+          r: 'pg', // Rating
+          default: 'mm' //Default
+        });
+        const newUser = new User({
+          name: req.body.name,
+          email: req.body.email,
+          avatar,
+          password: req.body.password
+        });
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newUser.password, salt, (err, hash) => {
+            if (err) throw err;
+            newUser.password = hash;
+            newUser.save()
+              .then(user => res.status(201).json(user))
+              .catch(err => console.log(err));
+          })
+        });
         // create reusable transporter object using the default SMTP transport
         let transporter = nodemailer.createTransport({
-            host: 'SMTP.gmail.com',
-            port: 465,
-            secure: true, // true for 465, false for other ports
-            auth: {
-                user: 'thecraftersconnectweb@gmail.com', 
-                pass: process.env.GMAIL_PASSWORD
-            }
+          host: 'SMTP.gmail.com',
+          port: 465,
+          secure: true, // true for 465, false for other ports
+          auth: {
+            user: 'thecraftersconnectweb@gmail.com',
+            pass: process.env.GMAIL_PASSWORD
+          }
         });
 
         // setup email data with unicode symbols
         let mailOptions = {
-            from: '"The Crafters Connect" <thecraftersconnectweb@gmail.com>', // sender address
-            to: req.body.email, // list of receivers
-            subject: `${req.body.name}, welcome to TCC ✔`, // Subject line
-            text: 'Welcome to The Crafters Connect, We are pleased to have you signed up on our platform', // plain text body
+          from: '"The Crafters Connect" <thecraftersconnectweb@gmail.com>', // sender address
+          to: req.body.email, // list of receivers
+          subject: `${req.body.name}, Welcome to TCC - Successful Registration`, // Subject line
+          text: 'Welcome to The Crafters Connect, We are excited to have you on this platform.', // plain text body
         };
 
         // send mail with defined transport object
         transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                return console.log(error);
-            }
-            console.log('Message sent: %s', info.messageId);
-            console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+          if (error) {
+            return console.log(error);
+          }
+          console.log('Message sent: %s', info.messageId);
+          console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
         });
-    }
-  })
+      }
+    })
 });
 
 // @route    POST api/users/login
@@ -93,39 +93,39 @@ router.post('/register', (req, res) => {
 router.post('/login', (req, res) => {
   const { errors, isValid } = validateLoginInput(req.body);
 
-  if(!isValid) {
+  if (!isValid) {
     return res.status(400).json(errors);
   }
   const email = req.body.email;
   const password = req.body.password;
 
   User.findOne({ email })
-  .then(user => {
-    if(!user) {
-      errors.email = 'User not found'
-      return res.status(404).json(errors);
-    }
-    //Check password
-    bcrypt.compare(password, user.password).then(isMatch => {
-      if(isMatch) {
-        // User Matched
-        const payload = { id: user.id, name: user.name, avatar: user.avatar } // Create jwt Payload
-        //Sign jsonwebtoken
-        jwt.sign(payload,
-          process.env.SECRET_OR_KEY,
-          { expiresIn: 86400 },
-          (err, token) => {
-            res.json({
-              success: true,
-              token: 'Bearer ' + token
-            })
-        });
-      } else {
-        errors.password = 'Password incorrect'
-        return res.status(400).json(errors);
+    .then(user => {
+      if (!user) {
+        errors.email = 'User not found'
+        return res.status(404).json(errors);
       }
+      //Check password
+      bcrypt.compare(password, user.password).then(isMatch => {
+        if (isMatch) {
+          // User Matched
+          const payload = { id: user.id, name: user.name, avatar: user.avatar } // Create jwt Payload
+          //Sign jsonwebtoken
+          jwt.sign(payload,
+            process.env.SECRET_OR_KEY,
+            { expiresIn: 86400 },
+            (err, token) => {
+              res.json({
+                success: true,
+                token: 'Bearer ' + token
+              })
+            });
+        } else {
+          errors.password = 'Password incorrect'
+          return res.status(400).json(errors);
+        }
+      });
     });
-  });
 });
 
 
