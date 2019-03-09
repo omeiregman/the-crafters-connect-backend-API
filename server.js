@@ -10,6 +10,7 @@ const crafters = require('./routes/api/crafters');
 const profiles = require('./routes/api/profiles');
 const posts = require('./routes/api/posts');
 const events = require('./routes/api/events');
+const home = require('./routes/api/home');
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use('/api/crafters', crafters);
 app.use('/api/profiles', profiles);
 app.use('/api/posts', posts);
 app.use('/api/events', events);
+app.use('/api/home', home);
 
 const port = process.env.PORT || 5000;
 
