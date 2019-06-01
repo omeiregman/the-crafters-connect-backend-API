@@ -11,6 +11,7 @@ const profiles = require('./routes/api/profiles');
 const posts = require('./routes/api/posts');
 const events = require('./routes/api/events');
 const home = require('./routes/api/home');
+const registerEvent = require('./routes/api/registerEvent');
 
 const app = express();
 
@@ -44,7 +45,8 @@ app.use('/api/profiles', profiles);
 app.use('/api/posts', posts);
 app.use('/api/events', events);
 app.use('/api/home', home);
+app.use('/api/events/register', registerEvent);
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
