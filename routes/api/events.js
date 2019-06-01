@@ -10,7 +10,7 @@ const storage = multer.diskStorage({
     cb(null, './uploads/events/');
   },
   filename: (req, file, cb) => {
-    cb(null, new Date().toISOString().replace(/:/g, '-')+file.originalname);
+    cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname);
   }
 });
 
@@ -25,7 +25,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   limits: {
-  fileSize: 1024 * 1024 * 5
+    fileSize: 1024 * 1024 * 5
   },
   fileFilter: fileFilter
 });
@@ -35,6 +35,7 @@ const validateEventInput = require('../../validation/event');
 
 //Load Event Model
 const Event = require('../../models/Event');
+const RegisterEvent = require('../../models/RegisterEvent');
 
 
 // @route    GET api/Events
@@ -43,17 +44,17 @@ const Event = require('../../models/Event');
 router.get('/all', (req, res, next) => {
   const errors = {};
   Event.find()
-  .then(events => {
-    if(!events) {
-      errors.noevent = 'There are currently no events to display at the moment';
-      return res.status(404).json(errors);
-    }
-    res.json({events: events});
-  }).catch(err => {
-    res.status(404).json({
-      event: 'There are currently no events to display at the moment'
-    });
-  })
+    .then(events => {
+      if (!events) {
+        errors.noevent = 'There are currently no events to display at the moment';
+        return res.status(404).json(errors);
+      }
+      res.json({ events: events });
+    }).catch(err => {
+      res.status(404).json({
+        event: 'There are currently no events to display at the moment'
+      });
+    })
 });
 
 // @route    GET api/events/:event
@@ -63,22 +64,22 @@ router.get('/all', (req, res, next) => {
 router.get('/:event', (req, res, next) => {
   //const name = req.params.name;
   Event.findById(req.params.event)
-  .exec().then(event => {
-    if(event) {
-      res.status(200).json({
-        message: "Event Found",
-        event: event
-      });
-    } else {
+    .exec().then(event => {
+      if (event) {
+        res.status(200).json({
+          message: "Event Found",
+          event: event
+        });
+      } else {
+        res.status(404).json({
+          message: "This event is not available anymore"
+        });
+      }
+    }).catch(err => {
       res.status(404).json({
-        message: "This event is not available anymore"
-      });
-    }
-  }).catch(err => {
-    res.status(404).json({
-      event: "There was a problem fetching this event"
+        event: "There was a problem fetching this event"
+      })
     })
-  })
 })
 
 
@@ -94,15 +95,16 @@ router.post('/add', upload.single('eventImage'), (req, res, next) => {
   //   return res.status(400).json(errors);
   // }
   const eventFields = {};
-    if(req.body.eventImage) eventFields.eventImage = req.file.path;
-    if(req.body.name) eventFields.name = req.body.name;
-    if(req.body.description) eventFields.description = req.body.description;
-    if(req.body.location) eventFields.location = req.body.location;
-    if(req.body.startDate) eventFields.startDate = req.body.startDate;
-    if(req.body.endDate) eventFields.endDate = req.body.endDate;
-    if(req.body.time) eventFields.time = req.body.time;
-    if(req.body.info) eventFields.info = req.body.info;
-    if(req.body.url) eventFields.url = req.body.url;
+  if (req.body.eventImage) eventFields.eventImage = req.file.path;
+  if (req.body.name) eventFields.name = req.body.name;
+  if (req.body.description) eventFields.description = req.body.description;
+  if (req.body.location) eventFields.location = req.body.location;
+  if (req.body.startDate) eventFields.startDate = req.body.startDate;
+  if (req.body.endDate) eventFields.endDate = req.body.endDate;
+  if (req.body.time) eventFields.time = req.body.time;
+  if (req.body.info) eventFields.info = req.body.info;
+  if (req.body.url) eventFields.url = req.body.url;
+  if (req.body.registration) eventFields.registration = req.body.registration;
 
 
 
@@ -120,7 +122,8 @@ router.post('/add', upload.single('eventImage'), (req, res, next) => {
     endDate: eventFields.endDate,
     time: eventFields.time,
     info: eventFields.info,
-    url: eventFields.url
+    url: eventFields.url,
+    registration: eventFields.registration
   });
 
   event.save().then(event => {
@@ -153,5 +156,6 @@ router.delete('/:eventId', (req, res, next) => {
     res.status(500).json(err);
   });
 });
+
 
 module.exports = router;

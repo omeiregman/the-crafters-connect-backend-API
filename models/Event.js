@@ -39,6 +39,10 @@ const EventSchema = new Schema({
   info: {
     type: String,
     required: true
+  },
+  registration: {
+    type: Boolean,
+    default: false
   }
 });
 
