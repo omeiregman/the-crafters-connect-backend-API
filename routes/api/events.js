@@ -1,34 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const AWS = require('aws-sdk');
+const fs = require('fs');
+const fileType = require('file-type');
+const bluebird = require('bluebird');
+const multiparty = require('multiparty');
 const mongoose = require('mongoose');
-const multer = require('multer');
+
 
 
 //Multer configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, './uploads/events/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname);
-  }
-});
-
-const fileFilter = (req, file, cb) => {
-  //reject a file
-  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-}
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 1024 * 1024 * 5
-  },
-  fileFilter: fileFilter
-});
 
 //Load Validation
 const validateEventInput = require('../../validation/event');
@@ -36,6 +17,33 @@ const validateEventInput = require('../../validation/event');
 //Load Event Model
 const Event = require('../../models/Event');
 const RegisterEvent = require('../../models/RegisterEvent');
+
+//Configure the keys for accessing AWS
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+});
+
+//configure AWS to work with promises
+AWS.config.setPromisesDependency(bluebird);
+
+//create S3 instance
+const s3 = new AWS.S3();
+
+//abstract function to upload a file returning a promise
+const uploadFile = (buffer, name, type) => {
+  console.log("upload file");
+  const params = {
+    ACL: 'public-read',
+    Body: buffer,
+    Bucket: process.env.S3_BUCKET_NAME,
+    ContentType: type.mime,
+    key: `${name}.${type.ext}`
+  };
+  return s3.upload(params).promise();
+};
+
+
 
 
 // @route    GET api/Events
@@ -87,7 +95,7 @@ router.get('/:event', (req, res, next) => {
 // @route    POST api/Events/new
 // @desc     POST new events
 // @access   Private
-router.post('/add', upload.single('eventImage'), (req, res, next) => {
+router.post('/add', (req, res, next) => {
   const { errors, isValid } = validateEventInput;
 
   //check validation
@@ -95,7 +103,8 @@ router.post('/add', upload.single('eventImage'), (req, res, next) => {
   //   return res.status(400).json(errors);
   // }
   const eventFields = {};
-  if (req.body.eventImage) eventFields.eventImage = req.file.path;
+  if (req.body.eventBanner) eventFields.eventBanner = req.body.eventBanner;
+  if (req.body.eventThumbnail) eventFields.eventThumbnail = req.body.eventThumbnail;
   if (req.body.name) eventFields.name = req.body.name;
   if (req.body.description) eventFields.description = req.body.description;
   if (req.body.location) eventFields.location = req.body.location;
@@ -107,14 +116,9 @@ router.post('/add', upload.single('eventImage'), (req, res, next) => {
   if (req.body.registration) eventFields.registration = req.body.registration;
 
 
-
-
-  console.log("Event field File Path: ", eventFields.eventImage);
-  console.log("File Path: ", req.file.path);
-
-
   const event = new Event({
-    eventImage: req.file.path,
+    eventBanner: eventFields.eventBanner,
+    eventThumbnail: eventFields.eventThumbnail,
     name: eventFields.name,
     description: eventFields.description,
     location: eventFields.location,
@@ -127,7 +131,6 @@ router.post('/add', upload.single('eventImage'), (req, res, next) => {
   });
 
   event.save().then(event => {
-    console.log("Event: ", event);
     res.status(201).json({
       message: "New Event has been added",
       event: event
@@ -136,6 +139,33 @@ router.post('/add', upload.single('eventImage'), (req, res, next) => {
     res.status(404).json({
       error: 'There was an error creating this event'
     })
+  });
+});
+
+
+router.post('/test-upload', (req, res, next) => {
+  console.log("inside router");
+
+  const form = new multiparty.Form();
+
+  form.parse(req, async (error, fields, files) => {
+    if (error) {
+      console.log("Error: ", error);
+      throw new Error(error);
+    }
+    try {
+      console.log("inside try block");
+      const path = files.file[0].path;
+      const buffer = fs.readFileSync(path);
+      const type = fileType(buffer);
+      const timestamp = Date.now().toString();
+      const fileName = `bucketFolder/${timestamp}-lg`;
+      const data = await uploadFile(buffer, fileName, type);
+      return res.status(201).send(data)
+    } catch (error) {
+      console.log("Catch: ", error);
+      return res.status(400).send(error);
+    }
   });
 });
 
@@ -157,5 +187,30 @@ router.delete('/:eventId', (req, res, next) => {
   });
 });
 
+
+//@route POST api/registerevent/new
+//@desc  POST register new event
+//@access PUBLIC
+router.post('/register', (req, res, next) => {
+  const registerEvent = new RegisterEvent({
+    name: req.body.name,
+    address: req.body.address,
+    phone: req.body.phone,
+    email: req.body.email,
+    eventId: req.body.eventId,
+    eventName: req.body.eventName
+  });
+
+  registerEvent.save().then(details => {
+    res.status(201).json({
+      message: "You have successfully registered for this event.",
+      details
+    });
+  }).catch(err => {
+    res.status(404).json({
+      error: "There was an error registering for this event."
+    });
+  });
+});
 
 module.exports = router;

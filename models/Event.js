@@ -29,7 +29,10 @@ const EventSchema = new Schema({
     type: String,
     required: true
   },
-  eventImage: {
+  eventBanner: {
+    type: String
+  },
+  eventThumbnail: {
     type: String
   },
   createdDate: {
